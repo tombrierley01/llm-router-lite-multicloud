@@ -1,0 +1,5 @@
+container_image    = "211125430714.dkr.ecr.eu-west-2.amazonaws.com/litellm-router:latest"
+LITELLM_MASTER_KEY = "sk-admin-a52b3a5c0fee101c3dc6073dda866ff0"
+openai_api_key     = "REDACTED_KEY"
+openai_project_id  = "proj_76Cc4oIy5XGE7nJXIdgpRKwQ"
+DATABASE_URL       = "postgresql://postgres:Fatman123@litellm-db:5432/postgres"
