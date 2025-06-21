@@ -18,10 +18,10 @@ Work in progress
 
 ## TODO
 
-- Add FastAPI wrapper around LiteLLM
-- Add AWS ECS + Bedrock Terraform
+- Add FastAPI wrapper around LiteLLM - done
+- Add AWS ECS + Bedrock Terraform - done
 - Add GCP Cloud Run Terraform
-- Implement cost logging per model
+- Implement cost logging per model 
 - Add fallback logic between providers
 - Add API key-based request auth
 - Create YouTube video
