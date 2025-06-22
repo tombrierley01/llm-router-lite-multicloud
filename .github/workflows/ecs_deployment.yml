@@ -59,7 +59,7 @@ jobs:
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
-          container-name: litellm          # Update to match container in your ECS task
+          container-name: litellm
           image: ${{ env.ECR_REPOSITORY }}:${{ github.sha }}
 
       - name: Deploy new task definition to ECS service

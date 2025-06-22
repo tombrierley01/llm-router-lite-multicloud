@@ -1,3 +1,8 @@
+# Define AZs in a variable for consistency
+locals {
+  azs = ["a", "b"]
+}
+
 resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
@@ -9,10 +14,11 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.main.id
 }
 
+# PUBLIC SUBNETS (one per AZ)
 resource "aws_subnet" "public" {
-  for_each                = toset(["a", "b"])
+  for_each                = { for az in local.azs : az => az }
   vpc_id                  = aws_vpc.main.id
-  cidr_block              = cidrsubnet(var.vpc_cidr, 4, index(["a", "b"], each.key))
+  cidr_block              = cidrsubnet(var.vpc_cidr, 4, index(local.azs, each.key))
   availability_zone       = "eu-west-2${each.key}"
   map_public_ip_on_launch = true
   tags = {
@@ -20,16 +26,16 @@ resource "aws_subnet" "public" {
   }
 }
 
+# PRIVATE SUBNETS (one per AZ)
 resource "aws_subnet" "private" {
-  for_each          = toset(["a", "b"])
+  for_each          = { for az in local.azs : az => az }
   vpc_id            = aws_vpc.main.id
-  cidr_block        = cidrsubnet(var.vpc_cidr, 4, 8 + index(["a", "b"], each.key))
+  cidr_block        = cidrsubnet(var.vpc_cidr, 4, 8 + index(local.azs, each.key))
   availability_zone = "eu-west-2${each.key}"
   tags = {
     Name = "private-${each.key}"
   }
 }
-
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.main.id
@@ -42,14 +48,14 @@ resource "aws_route_table" "public" {
   tags = { Name = "public" }
 }
 
-
 resource "aws_route_table_association" "public_assoc" {
-  for_each       = aws_subnet.public
-  subnet_id      = each.value.id
+  for_each       = { for az in local.azs : az => aws_subnet.public[az].id }
+  subnet_id      = each.value
   route_table_id = aws_route_table.public.id
 }
 
-/* SGs */
+# Security Groups
+
 resource "aws_security_group" "alb_sg" {
   name        = "alb-sg"
   description = "Allow HTTP/HTTPS"
@@ -83,22 +89,19 @@ resource "aws_security_group" "alb_sg" {
   }
 }
 
-
 resource "aws_security_group" "ecs_sg" {
   name        = "ecs-sg"
-  description = "Allow ALB -> ECS (port 4000)"
+  description = "Allow ALB ECS (port 4000)"
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description              = "From ALB on 4000"
-    from_port                = 4000
-    to_port                  = 4000
-    protocol                 = "tcp"
-    security_groups          = [aws_security_group.alb_sg.id]  # reference ALB SG
-    ipv6_cidr_blocks         = []
-    cidr_blocks              = []
-    prefix_list_ids          = []
-    self                     = false
+    description      = "From ALB on 4000"
+    from_port        = 4000
+    to_port          = 4000
+    protocol         = "tcp"
+    security_groups  = [aws_security_group.alb_sg.id]
+    cidr_blocks      = []
+    ipv6_cidr_blocks = []
   }
 
   egress {
@@ -108,8 +111,5 @@ resource "aws_security_group" "ecs_sg" {
     protocol         = "-1"
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = []
-    prefix_list_ids  = []
-    security_groups  = []
-    self             = false
   }
 }
