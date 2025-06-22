@@ -37,13 +37,16 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v2
 
       # --- Build & Push Docker Image ---
-      - name: Build Docker image
+      - name: Build & push Docker image
         run: |
-          docker build -t $ECR_REPOSITORY:${{ github.sha }} .
-          docker tag $ECR_REPOSITORY:${{ github.sha }} $ECR_REPOSITORY:latest
+          docker build \
+            -f router/Dockerfile \
+            -t $ECR_REPOSITORY:${{ github.sha }} \
+            ./router
 
-      - name: Push Docker image to ECR
-        run: |
+          docker tag $ECR_REPOSITORY:${{ github.sha }} \
+                    $ECR_REPOSITORY:latest
+
           docker push $ECR_REPOSITORY:${{ github.sha }}
           docker push $ECR_REPOSITORY:latest
 
@@ -70,4 +73,4 @@ jobs:
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
 
-      # Optional: Notify on Slack/Teams, run integration tests, etc.
+      # later: Notify on Slack/Teams, run integration tests, etc.
