@@ -1,0 +1,95 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Python virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints
+
+# .env files and config secrets
+*.env
+.env.*
+!env.example
+
+# Docker artifacts
+**/Dockerfile
+**/docker-compose*.yml
+.docker/
+docker-compose.override.yml
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars.backup
+.terraform.lock.hcl
+*.tfvars
+*.env
+
+# Ignore generated plan files
+*.tfplan
+
+# VSCode and JetBrains
+.vscode/
+.idea/
+
+# Node/NPM (if ever needed for monitoring UI etc)
+node_modules/
+npm-debug.log*
+yarn-error.log
+pnpm-debug.log
+
+# OS/Editor
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Images & diagrams
+*.png
+*.jpg
+*.jpeg
+*.svg
+
+# Mac OS X System Files
+.AppleDouble
+.LSOverride
+
+# Logs
+*.log
+
+# Coverage & testing
+.coverage
+.tox/
+.nox/
+coverage.xml
+htmlcov/
+
+# Pycharm/JetBrains
+*.iml
+*.ipr
+*.iws
+out/
+
+# GitHub workflows cache
+.github/workflows/*.tmp
+.github/workflows/*.bak
+
+# Secrets (Terraform/other tooling)
+secrets.auto.tfvars
+*.secret
+*.pem
+*.key
+*.crt
+
+# Ignore monitoring temp output
+monitoring/output/
+monitoring/*.out

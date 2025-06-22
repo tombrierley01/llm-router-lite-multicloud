@@ -29,10 +29,12 @@ resource "aws_ecs_task_definition" "this" {
         }
       }
 
-      secrets = [{
-        name      = "OPENAI_API_KEY"
-        valueFrom = var.openai_secret_arn
-      }]
+      secrets = [
+        { name = "OPENAI_API_KEY",      valueFrom = var.openai_secret_arn },
+        { name = "OPENAI_PROJECT_ID",   valueFrom = var.openai_project_id_secret_arn },
+        { name = "LITELLM_MASTER_KEY",  valueFrom = var.litellm_master_key_secret_arn },
+        { name = "DATABASE_URL",        valueFrom = var.database_url_secret_arn }
+      ]
     }
   ])
 }

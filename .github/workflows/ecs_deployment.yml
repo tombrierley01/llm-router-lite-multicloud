@@ -1,0 +1,73 @@
+name: Deploy to ECS Fargate
+
+on:
+  push:
+    branches: [main]
+
+env:
+  AWS_REGION: eu-west-2
+  ECR_REPOSITORY: 211125430714.dkr.ecr.eu-west-2.amazonaws.com/litellm-router
+  ECS_CLUSTER: litellm-cluster
+  ECS_SERVICE: litellm-service
+  ECS_TASK_DEFINITION: litellm-task
+
+jobs:
+  deploy:
+    name: Build, Push & Deploy to ECS
+    runs-on: ubuntu-latest
+
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # --- Login to AWS ---
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      # --- ECR Login ---
+      - name: Login to Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      # --- Build & Push Docker Image ---
+      - name: Build Docker image
+        run: |
+          docker build -t $ECR_REPOSITORY:${{ github.sha }} .
+          docker tag $ECR_REPOSITORY:${{ github.sha }} $ECR_REPOSITORY:latest
+
+      - name: Push Docker image to ECR
+        run: |
+          docker push $ECR_REPOSITORY:${{ github.sha }}
+          docker push $ECR_REPOSITORY:latest
+
+      # --- Deploy to ECS ---
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition $ECS_TASK_DEFINITION \
+            --query taskDefinition > task-definition.json
+
+      - name: Update image in task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: litellm          # Update to match container in your ECS task
+          image: ${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+
+      - name: Deploy new task definition to ECS service
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+      # Optional: Notify on Slack/Teams, run integration tests, etc.

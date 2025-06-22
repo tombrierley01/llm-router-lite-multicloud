@@ -1,0 +1,21 @@
+model_list:
+  # ---------- OpenAI ----------
+  - model_name: gpt-3.5-turbo
+    litellm_provider: openai
+    litellm_params:
+      model: gpt-3.5-turbo
+      api_key: os.environ/OPENAI_API_KEY
+
+  # ---------- Bedrock / Anthropic ----------
+  - model_name: claude-haiku
+    litellm_provider: bedrock
+    litellm_params:
+      model: bedrock/anthropic.claude-3-haiku-20240307-v1:0
+      aws_region_name: eu-west-2
+      aws_access_key_id: os.environ/AWS_ACCESS_KEY_ID
+      aws_secret_access_key: os.environ/AWS_SECRET_ACCESS_KEY
+
+general_settings:
+  openai_project_id: os.environ/OPENAI_PROJECT_ID
+  database_url:      os.environ/DATABASE_URL
+
