@@ -14,6 +14,36 @@ data "aws_iam_policy_document" "ecs_tasks" {
   }
 }
 
+/* Read from AWS Secrets */
+###############################################################################
+# Allow the execution role to read the four Secrets Manager entries
+###############################################################################
+
+data "aws_iam_policy_document" "exec_secrets" {
+  statement {
+    sid    = "ReadLiteLLMSecrets"
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret"
+    ]
+
+    resources = [
+      var.openai_secret_arn,
+      var.openai_project_id_secret_arn,
+      var.litellm_master_key_secret_arn,
+      var.database_url_secret_arn
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "exec_secrets" {
+  name   = "litellm-exec-read-secrets"
+  role   = aws_iam_role.task_exec.id
+  policy = data.aws_iam_policy_document.exec_secrets.json
+}
+
 
 
 resource "aws_iam_role_policy_attachment" "exec_logs" {

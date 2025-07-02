@@ -32,9 +32,8 @@ docker-compose.override.yml
 crash.log
 *.tfvars.backup
 .terraform.lock.hcl
-*.tfvars
 *.env
-
+*.tfvars
 # Ignore generated plan files
 *.tfplan
 

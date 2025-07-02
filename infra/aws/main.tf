@@ -3,7 +3,11 @@ module "network" {
 }
 
 module "iam" {
-  source = "./iam"
+  source                        = "./iam"
+  openai_secret_arn             = module.secrets.openai_secret_arn
+  openai_project_id_secret_arn  = module.secrets.openai_project_id_secret_arn
+  litellm_master_key_secret_arn = module.secrets.litellm_master_key_secret_arn
+  database_url_secret_arn       = module.secrets.database_url_secret_arn
 }
 
 module "cloudwatch" {
@@ -11,11 +15,11 @@ module "cloudwatch" {
 }
 
 module "secrets" {
-  source              = "./secrets"
-  openai_api_key      = var.openai_api_key
-  openai_project_id   = var.openai_project_id
-  LITELLM_MASTER_KEY  = var.LITELLM_MASTER_KEY
-  DATABASE_URL        = var.DATABASE_URL
+  source             = "./secrets"
+  openai_api_key     = var.openai_api_key
+  openai_project_id  = var.openai_project_id
+  LITELLM_MASTER_KEY = var.LITELLM_MASTER_KEY
+  DATABASE_URL       = var.DATABASE_URL
 }
 
 module "alb" {

@@ -15,13 +15,13 @@ variable "openai_project_id" {
 }
 
 variable "LITELLM_MASTER_KEY" {
-  type      = string
-  sensitive = true
+  type        = string
+  sensitive   = true
   description = "Auth key"
 }
 
 variable "DATABASE_URL" {
-  type      = string
-  sensitive = true
+  type        = string
+  sensitive   = true
   description = "RDS Connection"
 }
