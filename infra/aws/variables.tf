@@ -25,3 +25,9 @@ variable "DATABASE_URL" {
   sensitive   = true
   description = "RDS Connection"
 }
+
+variable "JWT_SECRET" {
+  type        = string
+  sensitive   = true
+  description = "JWT for auth"
+}

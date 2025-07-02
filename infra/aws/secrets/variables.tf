@@ -18,3 +18,8 @@ variable "DATABASE_URL" {
   type        = string
   sensitive   = true
 }
+variable "JWT_SECRET" {
+  description = "JWT for Auth"
+  type        = string
+  sensitive   = true
+}

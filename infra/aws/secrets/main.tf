@@ -14,6 +14,15 @@ resource "aws_secretsmanager_secret_version" "openai_project_id_v1" {
   secret_string = var.openai_project_id
 }
 
+resource "aws_secretsmanager_secret" "jwt_secret" {
+  name = "jwt-secret"
+}
+
+resource "aws_secretsmanager_secret_version" "jwt_secret_v1" {
+  secret_id     = aws_secretsmanager_secret.jwt_secret.id
+  secret_string = var.JWT_SECRET
+}
+
 resource "aws_secretsmanager_secret" "litellm_master_key" {
   name = "litellm-master-key"
 }

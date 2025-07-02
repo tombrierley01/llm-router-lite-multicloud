@@ -33,7 +33,8 @@ data "aws_iam_policy_document" "exec_secrets" {
       var.openai_secret_arn,
       var.openai_project_id_secret_arn,
       var.litellm_master_key_secret_arn,
-      var.database_url_secret_arn
+      var.database_url_secret_arn,
+      var.jwt_secret_secret_arn
     ]
   }
 }

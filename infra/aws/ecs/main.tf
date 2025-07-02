@@ -1,5 +1,5 @@
 locals {
-  image = var.container_image != "" ? var.container_image : "ghcr.io/berriai/litellm:main-latest"
+  image = var.container_image != "" ? var.container_image : "211125430714.dkr.ecr.eu-west-2.amazonaws.com/litellm-router"
 }
 
 resource "aws_ecs_cluster" "this" { name = "litellm-cluster" }
@@ -18,7 +18,7 @@ resource "aws_ecs_task_definition" "this" {
     {
       name  = "litellm"
       image = local.image
-      portMappings = [{ containerPort = 4000, protocol = "tcp" }]
+      portMappings = [{ containerPort = 8000, protocol = "tcp" }]
 
       logConfiguration = {
         logDriver = "awslogs"
@@ -33,7 +33,8 @@ resource "aws_ecs_task_definition" "this" {
         { name = "OPENAI_API_KEY",      valueFrom = var.openai_secret_arn },
         { name = "OPENAI_PROJECT_ID",   valueFrom = var.openai_project_id_secret_arn },
         { name = "LITELLM_MASTER_KEY",  valueFrom = var.litellm_master_key_secret_arn },
-        { name = "DATABASE_URL",        valueFrom = var.database_url_secret_arn }
+        { name = "DATABASE_URL",        valueFrom = var.database_url_secret_arn },
+        { name = "JWT_SECRET",          valueFrom = var.jwt_secret_secret_arn }
       ]
     }
   ])
@@ -55,6 +56,6 @@ resource "aws_ecs_service" "this" {
   load_balancer {
     target_group_arn = var.tg_arn
     container_name   = "litellm"
-    container_port   = 4000
+    container_port   = 8000
   }
 }

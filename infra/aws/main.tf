@@ -20,6 +20,7 @@ module "secrets" {
   openai_project_id  = var.openai_project_id
   LITELLM_MASTER_KEY = var.LITELLM_MASTER_KEY
   DATABASE_URL       = var.DATABASE_URL
+  JWT_SECRET         = var.JWT_SECRET
 }
 
 module "alb" {
