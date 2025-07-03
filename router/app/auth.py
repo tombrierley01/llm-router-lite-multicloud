@@ -4,7 +4,9 @@ import jwt, os
 
 security = HTTPBearer()
 
-SECRET = os.getenv("JWT_SECRET", "dev-secret")
+SECRET = os.getenv("JWT_SECRET")
+if not SECRET:
+    raise RuntimeError("JWT_SECRET not loaded")
 
 def get_current_user(
     creds: HTTPAuthorizationCredentials = Depends(security)

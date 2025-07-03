@@ -8,6 +8,7 @@ module "iam" {
   openai_project_id_secret_arn  = module.secrets.openai_project_id_secret_arn
   litellm_master_key_secret_arn = module.secrets.litellm_master_key_secret_arn
   database_url_secret_arn       = module.secrets.database_url_secret_arn
+  jwt_secret_secret_arn         = module.secrets.jwt_secret_secret_arn
 }
 
 module "cloudwatch" {
@@ -45,4 +46,5 @@ module "ecs" {
   litellm_master_key_secret_arn = module.secrets.litellm_master_key_secret_arn
   database_url_secret_arn       = module.secrets.database_url_secret_arn
   container_image               = var.container_image
+  jwt_secret_secret_arn         = module.secrets.jwt_secret_secret_arn
 }

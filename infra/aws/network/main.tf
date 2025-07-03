@@ -91,13 +91,13 @@ resource "aws_security_group" "alb_sg" {
 
 resource "aws_security_group" "ecs_sg" {
   name        = "ecs-sg"
-  description = "Allow ALB ECS (port 4000)"
+  description = "Allow ALB ECS (port 8000)"
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description      = "From ALB on 4000"
-    from_port        = 4000
-    to_port          = 4000
+    description      = "From ALB on 8000"
+    from_port        = 8000
+    to_port          = 8000
     protocol         = "tcp"
     security_groups  = [aws_security_group.alb_sg.id]
     cidr_blocks      = []
@@ -112,4 +112,41 @@ resource "aws_security_group" "ecs_sg" {
     cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = []
   }
+}
+
+# Allocate an Elastic IP for the NAT Gateway
+resource "aws_eip" "nat" {
+  domain = "vpc"
+  depends_on = [aws_internet_gateway.igw]
+}
+
+# NAT Gateway in the first public subnet
+resource "aws_nat_gateway" "this" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public["a"].id   # use the A-zone public subnet
+  tags = { Name = "litellm-nat" }
+}
+
+# Route table for *each* private subnet (one route table per AZ)
+resource "aws_route_table" "private" {
+  # keys = "a", "b" (static), values = subnet objects (unknown until apply)
+  for_each = { for az in local.azs : az => aws_subnet.private[az] }
+
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.this.id
+  }
+
+  tags = { Name = "private-${each.key}" }
+}
+
+# 2️⃣  Association for each private subnet
+resource "aws_route_table_association" "private_assoc" {
+  # same static-key trick
+  for_each       = { for az in local.azs : az => aws_subnet.private[az] }
+
+  subnet_id      = each.value.id
+  route_table_id = aws_route_table.private[each.key].id
 }

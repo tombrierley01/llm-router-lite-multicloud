@@ -12,7 +12,7 @@ resource "aws_lb" "this" {
 
 resource "aws_lb_target_group" "tg" {
   name        = "litellm-tg"
-  port        = 4000
+  port        = 8000
   protocol    = "HTTP"
   target_type = "ip"
   vpc_id      = var.vpc_id

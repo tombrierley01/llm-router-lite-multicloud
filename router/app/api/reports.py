@@ -5,7 +5,7 @@ from datetime import datetime
 import yaml, litellm, os, asyncpg
 
 # ── Auth dependency ────────────────────────────────────────────────────────────
-from app.auth import get_current_user    # <- validates JWT and returns its claims
+from app.auth import get_current_user
 
 router = APIRouter()
 
@@ -20,9 +20,9 @@ if not model_list:
 
 llm_router = litellm.Router(model_list=model_list)
 
-# ── 2. Initialise a global asyncpg pool (lazy) ────────────────────────────────
-PG_URL = os.getenv("DATABASE_URL")          # must be set in env vars / ECS task
-DB_POOL: asyncpg.Pool | None = None         # type hint for IDEs
+# ── 2. Initialise a global asyncpg pool ────────────────────────────────
+PG_URL = os.getenv("DATABASE_URL")
+DB_POOL: asyncpg.Pool | None = None # Lazy loading
 
 
 async def get_pool() -> asyncpg.Pool:
@@ -68,7 +68,7 @@ class ReportResponse(BaseModel):
 )
 async def generate_report(
     data: ReportRequest,
-    user=Depends(get_current_user),  # claims from JWT
+    user=Depends(get_current_user),
 ):
     """
     • Summarises symptoms with an LLM
@@ -93,7 +93,7 @@ async def generate_report(
 
     summary = resp["choices"][0]["message"]["content"]
 
-    # Persist to DB
+    # Save to DB
     await save_report(user["sub"], user.get("tenant", "unknown"), summary)
 
     return ReportResponse(
