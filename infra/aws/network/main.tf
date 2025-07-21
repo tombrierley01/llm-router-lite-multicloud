@@ -7,7 +7,7 @@ resource "aws_vpc" "main" {
   cidr_block           = var.vpc_cidr
   enable_dns_support   = true
   enable_dns_hostnames = true
-  tags = { Name = "litellm-vpc" }
+  tags                 = { Name = "litellm-vpc" }
 }
 
 resource "aws_internet_gateway" "igw" {
@@ -116,15 +116,15 @@ resource "aws_security_group" "ecs_sg" {
 
 # Allocate an Elastic IP for the NAT Gateway
 resource "aws_eip" "nat" {
-  domain = "vpc"
+  domain     = "vpc"
   depends_on = [aws_internet_gateway.igw]
 }
 
 # NAT Gateway in the first public subnet
 resource "aws_nat_gateway" "this" {
   allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public["a"].id   # use the A-zone public subnet
-  tags = { Name = "litellm-nat" }
+  subnet_id     = aws_subnet.public["a"].id # use the A-zone public subnet
+  tags          = { Name = "litellm-nat" }
 }
 
 # Route table for *each* private subnet (one route table per AZ)
@@ -145,7 +145,7 @@ resource "aws_route_table" "private" {
 # 2️⃣  Association for each private subnet
 resource "aws_route_table_association" "private_assoc" {
   # same static-key trick
-  for_each       = { for az in local.azs : az => aws_subnet.private[az] }
+  for_each = { for az in local.azs : az => aws_subnet.private[az] }
 
   subnet_id      = each.value.id
   route_table_id = aws_route_table.private[each.key].id
