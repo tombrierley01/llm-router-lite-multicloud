@@ -16,8 +16,8 @@ resource "aws_ecs_task_definition" "this" {
 
   container_definitions = jsonencode([
     {
-      name  = "litellm"
-      image = local.image
+      name         = "litellm"
+      image        = local.image
       portMappings = [{ containerPort = 8000, protocol = "tcp" }]
 
       logConfiguration = {
@@ -30,11 +30,11 @@ resource "aws_ecs_task_definition" "this" {
       }
 
       secrets = [
-        { name = "OPENAI_API_KEY",      valueFrom = var.openai_secret_arn },
-        { name = "OPENAI_PROJECT_ID",   valueFrom = var.openai_project_id_secret_arn },
-        { name = "LITELLM_MASTER_KEY",  valueFrom = var.litellm_master_key_secret_arn },
-        { name = "DATABASE_URL",        valueFrom = var.database_url_secret_arn },
-        { name = "JWT_SECRET",          valueFrom = var.jwt_secret_secret_arn }
+        { name = "OPENAI_API_KEY", valueFrom = var.openai_secret_arn },
+        { name = "OPENAI_PROJECT_ID", valueFrom = var.openai_project_id_secret_arn },
+        { name = "LITELLM_MASTER_KEY", valueFrom = var.litellm_master_key_secret_arn },
+        { name = "DATABASE_URL", valueFrom = var.database_url_secret_arn },
+        { name = "JWT_SECRET", valueFrom = var.jwt_secret_secret_arn }
       ]
     }
   ])
@@ -44,12 +44,12 @@ resource "aws_ecs_service" "this" {
   name            = "litellm-service"
   cluster         = aws_ecs_cluster.this.id
   task_definition = aws_ecs_task_definition.this.arn
-  desired_count   = 1
+  desired_count   = 3
   launch_type     = "FARGATE"
 
   network_configuration {
     assign_public_ip = false
-    security_groups = [var.ecs_sg_id]
+    security_groups  = [var.ecs_sg_id]
     subnets          = var.private_subnet_ids
   }
 
