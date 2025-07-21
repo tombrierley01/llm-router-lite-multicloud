@@ -59,3 +59,8 @@ resource "aws_ecs_service" "this" {
     container_port   = 8000
   }
 }
+
+resource "aws_ecs_service" "example" {
+  desired_count = 2
+  ...
+}
