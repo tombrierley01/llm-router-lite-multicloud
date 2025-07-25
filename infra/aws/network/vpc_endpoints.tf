@@ -35,17 +35,17 @@ resource "aws_security_group" "vpce_sg" {
 
 
 resource "aws_vpc_endpoint" "interface" {
-  for_each            = local.interface_endpoints
+  for_each = local.interface_endpoints
 
-  vpc_id              = aws_vpc.main.id
-  service_name        = each.value
-  vpc_endpoint_type   = "Interface"
+  vpc_id            = aws_vpc.main.id
+  service_name      = each.value
+  vpc_endpoint_type = "Interface"
 
   # all private subnets (map -> list -> ids)
-  subnet_ids          = values(aws_subnet.private)[*].id
-  security_group_ids  = [aws_security_group.vpce_sg.id]
+  subnet_ids         = values(aws_subnet.private)[*].id
+  security_group_ids = [aws_security_group.vpce_sg.id]
 
-  private_dns_enabled = true              # *.amazonaws resolves → VPCE
+  private_dns_enabled = true # *.amazonaws resolves → VPCE
 
   tags = {
     Name = "vpce-${each.key}"
