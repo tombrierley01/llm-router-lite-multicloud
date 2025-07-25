@@ -1,6 +1,6 @@
-variable "vpc_id"            { type = string }
+variable "vpc_id" { type = string }
 variable "public_subnet_ids" { type = list(string) }
-variable "alb_sg_id"         { type = string }
+variable "alb_sg_id" { type = string }
 
 resource "aws_lb" "this" {
   name               = "litellm-alb"
@@ -36,4 +36,4 @@ resource "aws_lb_listener" "http" {
 }
 
 output "target_group_arn" { value = aws_lb_target_group.tg.arn }
-output "alb_dns"          { value = aws_lb.this.dns_name }
+output "alb_dns" { value = aws_lb.this.dns_name }
